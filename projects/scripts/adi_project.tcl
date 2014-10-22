@@ -198,7 +198,7 @@ proc adi_project_run {project_name} {
 
   export_hardware [get_files $project_system_dir/system.bd] [get_runs impl_1] -bitstream
 
-  if [expr [get_property SLACK [get_timing_paths]] < 0] {
+  if [expr [get_property SLACK [get_timing_paths -delay_type min_max]] < 0] {
     puts "ERROR: Timing Constraints NOT met."
     use_this_invalid_command_to_crash
   }
