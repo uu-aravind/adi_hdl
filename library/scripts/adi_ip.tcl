@@ -13,7 +13,21 @@ proc adi_ip_files {ip_name ip_files} {
 
   set proj_fileset [get_filesets sources_1]
   add_files -norecurse -scan_for_includes -fileset $proj_fileset $ip_files
+  ip_import_files
   set_property "top" "$ip_name" $proj_fileset
+  
+}
+
+proc ip_import_files {} {
+  # import all non-local files
+  set fileList [get_files]
+  set thisDir [pwd]
+  set proj_fileset [get_filesets sources_1]
+  foreach fileItem $fileList {
+    if {![regexp [string tolower $thisDir] [string tolower $fileItem]]} {
+      import_file -fileset $proj_fileset $fileItem
+    }
+  }
 }
 
 proc adi_ip_constraints {ip_name ip_constr_files} {
