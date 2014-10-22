@@ -1,40 +1,6 @@
 
 # constraints
 
-# hdmi
-
-set_property  -dict {PACKAGE_PIN  P28   IOSTANDARD LVCMOS25} [get_ports hdmi_out_clk]
-set_property  -dict {PACKAGE_PIN  U21   IOSTANDARD LVCMOS25} [get_ports hdmi_vsync]
-set_property  -dict {PACKAGE_PIN  R22   IOSTANDARD LVCMOS25} [get_ports hdmi_hsync]
-set_property  -dict {PACKAGE_PIN  V24   IOSTANDARD LVCMOS25} [get_ports hdmi_data_e]
-set_property  -dict {PACKAGE_PIN  U24   IOSTANDARD LVCMOS25} [get_ports hdmi_data[0]]
-set_property  -dict {PACKAGE_PIN  T22   IOSTANDARD LVCMOS25} [get_ports hdmi_data[1]]
-set_property  -dict {PACKAGE_PIN  R23   IOSTANDARD LVCMOS25} [get_ports hdmi_data[2]]
-set_property  -dict {PACKAGE_PIN  AA25  IOSTANDARD LVCMOS25} [get_ports hdmi_data[3]]
-set_property  -dict {PACKAGE_PIN  AE28  IOSTANDARD LVCMOS25} [get_ports hdmi_data[4]]
-set_property  -dict {PACKAGE_PIN  T23   IOSTANDARD LVCMOS25} [get_ports hdmi_data[5]]
-set_property  -dict {PACKAGE_PIN  AB25  IOSTANDARD LVCMOS25} [get_ports hdmi_data[6]]
-set_property  -dict {PACKAGE_PIN  T27   IOSTANDARD LVCMOS25} [get_ports hdmi_data[7]]
-set_property  -dict {PACKAGE_PIN  AD26  IOSTANDARD LVCMOS25} [get_ports hdmi_data[8]]
-set_property  -dict {PACKAGE_PIN  AB26  IOSTANDARD LVCMOS25} [get_ports hdmi_data[9]]
-set_property  -dict {PACKAGE_PIN  AA28  IOSTANDARD LVCMOS25} [get_ports hdmi_data[10]]
-set_property  -dict {PACKAGE_PIN  AC26  IOSTANDARD LVCMOS25} [get_ports hdmi_data[11]]
-set_property  -dict {PACKAGE_PIN  AE30  IOSTANDARD LVCMOS25} [get_ports hdmi_data[12]]
-set_property  -dict {PACKAGE_PIN  Y25   IOSTANDARD LVCMOS25} [get_ports hdmi_data[13]]
-set_property  -dict {PACKAGE_PIN  AA29  IOSTANDARD LVCMOS25} [get_ports hdmi_data[14]]
-set_property  -dict {PACKAGE_PIN  AD30  IOSTANDARD LVCMOS25} [get_ports hdmi_data[15]]
-set_property  -dict {PACKAGE_PIN  Y28   IOSTANDARD LVCMOS25} [get_ports hdmi_data[16]]
-set_property  -dict {PACKAGE_PIN  AF28  IOSTANDARD LVCMOS25} [get_ports hdmi_data[17]]
-set_property  -dict {PACKAGE_PIN  V22   IOSTANDARD LVCMOS25} [get_ports hdmi_data[18]]
-set_property  -dict {PACKAGE_PIN  AA27  IOSTANDARD LVCMOS25} [get_ports hdmi_data[19]]
-set_property  -dict {PACKAGE_PIN  U22   IOSTANDARD LVCMOS25} [get_ports hdmi_data[20]]
-set_property  -dict {PACKAGE_PIN  N28   IOSTANDARD LVCMOS25} [get_ports hdmi_data[21]]
-set_property  -dict {PACKAGE_PIN  V21   IOSTANDARD LVCMOS25} [get_ports hdmi_data[22]]
-set_property  -dict {PACKAGE_PIN  AC22  IOSTANDARD LVCMOS25} [get_ports hdmi_data[23]]
-
-# spdif
-
-set_property  -dict {PACKAGE_PIN  AC21  IOSTANDARD LVCMOS25} [get_ports spdif]
 
 # iic
 
@@ -61,3 +27,17 @@ set_property  -dict {PACKAGE_PIN  J15   IOSTANDARD LVCMOS15} [get_ports gpio_bd[
 set_property  -dict {PACKAGE_PIN  J16   IOSTANDARD LVCMOS15} [get_ports gpio_bd[13]]          ; ## XADC_GPIO_2
 set_property  -dict {PACKAGE_PIN  J14   IOSTANDARD LVCMOS15} [get_ports gpio_bd[14]]          ; ## XADC_GPIO_3
 
+# clocks
+
+create_clock -name cpu_clk      -period 10.00 [get_pins i_system_wrapper/system_i/sys_ps7/FCLK_CLK0]
+create_clock -name m200_clk     -period  5.00 [get_pins i_system_wrapper/system_i/sys_ps7/FCLK_CLK1]
+
+create_clock -name ps7_clk_0  -period 10.00 [get_pins i_system_wrapper/system_i/sys_ps7/inst/PS7_i/FCLKCLK[0]]
+create_clock -name ps7_clk_1  -period 5.00  [get_pins i_system_wrapper/system_i/sys_ps7/inst/PS7_i/FCLKCLK[1]]
+
+
+set_clock_groups -asynchronous -group {cpu_clk}
+set_clock_groups -asynchronous -group {m200_clk}
+
+set_clock_groups -asynchronous -group {ps7_clk_0}
+set_clock_groups -asynchronous -group {ps7_clk_1}
