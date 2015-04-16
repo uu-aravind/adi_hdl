@@ -17,11 +17,13 @@ proc p_sys_rfifo {p_name m_name m_width s_width} {
 
   create_bd_pin -dir I -type clk m_clk
   create_bd_pin -dir I m_rd
+  create_bd_pin -dir I m_en
   create_bd_pin -dir O m_runf
   create_bd_pin -dir O -from [expr ($m_width-1)] -to 0 m_rdata
 
   create_bd_pin -dir I -type clk s_clk
   create_bd_pin -dir O s_rd
+  create_bd_pin -dir O s_en
   create_bd_pin -dir I s_runf
   create_bd_pin -dir I -from [expr ($s_width-1)] -to 0 s_rdata
 
@@ -29,7 +31,7 @@ proc p_sys_rfifo {p_name m_name m_width s_width} {
   set_property -dict [list CONFIG.M_DATA_WIDTH $m_width] $rfifo_ctl
   set_property -dict [list CONFIG.S_DATA_WIDTH $s_width] $rfifo_ctl
 
-  set rfifo_mem [create_bd_cell -type ip -vlnv xilinx.com:ip:fifo_generator:11.0 rfifo_mem]
+  set rfifo_mem [create_bd_cell -type ip -vlnv xilinx.com:ip:fifo_generator:12.0 rfifo_mem]
   set_property -dict [list CONFIG.INTERFACE_TYPE {Native}] $rfifo_mem
   set_property -dict [list CONFIG.Fifo_Implementation {Independent_Clocks_Block_RAM}] $rfifo_mem
   set_property -dict [list CONFIG.Input_Data_Width $s_width] $rfifo_mem
@@ -43,13 +45,15 @@ proc p_sys_rfifo {p_name m_name m_width s_width} {
   connect_bd_net -net rstn                    [get_bd_pins rfifo_ctl/rstn]
   connect_bd_net -net m_clk                   [get_bd_pins rfifo_ctl/m_clk]
   connect_bd_net -net s_clk                   [get_bd_pins rfifo_ctl/s_clk]
-  connect_bd_net -net m_clk                   [get_bd_pins rfifo_mem/wr_clk]
-  connect_bd_net -net s_clk                   [get_bd_pins rfifo_mem/rd_clk]
+  connect_bd_net -net m_clk                   [get_bd_pins rfifo_mem/rd_clk]
+  connect_bd_net -net s_clk                   [get_bd_pins rfifo_mem/wr_clk]
 
   connect_bd_net -net m_rd                    [get_bd_pins m_rd]                      [get_bd_pins rfifo_ctl/m_rd]
+  connect_bd_net -net m_en                    [get_bd_pins m_en]                      [get_bd_pins rfifo_ctl/m_en]
   connect_bd_net -net m_rdata                 [get_bd_pins m_rdata]                   [get_bd_pins rfifo_ctl/m_rdata]
   connect_bd_net -net m_runf                  [get_bd_pins m_runf]                    [get_bd_pins rfifo_ctl/m_runf]
   connect_bd_net -net s_rd                    [get_bd_pins s_rd]                      [get_bd_pins rfifo_ctl/s_rd]
+  connect_bd_net -net s_en                    [get_bd_pins s_en]                      [get_bd_pins rfifo_ctl/s_en]
   connect_bd_net -net s_rdata                 [get_bd_pins s_rdata]                   [get_bd_pins rfifo_ctl/s_rdata]
   connect_bd_net -net s_runf                  [get_bd_pins s_runf]                    [get_bd_pins rfifo_ctl/s_runf]
 

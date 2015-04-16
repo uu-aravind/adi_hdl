@@ -45,10 +45,12 @@ module util_rfifo (
 
   m_clk,
   m_rd,
+  m_en,
   m_rdata,
   m_runf,
   s_clk,
   s_rd,
+  s_en,
   s_rdata,
   s_runf,
 
@@ -63,6 +65,7 @@ module util_rfifo (
 
   // parameters (S) bus width must be greater than (M)
 
+  parameter MS_CLOCK_RATIO = 4;
   parameter M_DATA_WIDTH = 32;
   parameter S_DATA_WIDTH = 64;
  
@@ -74,10 +77,12 @@ module util_rfifo (
 
   input                           m_clk;
   input                           m_rd;
+  input                           m_en;
   output  [M_DATA_WIDTH-1:0]      m_rdata;
   output                          m_runf;
   input                           s_clk;
   output                          s_rd;
+  output                          s_en;
   input   [S_DATA_WIDTH-1:0]      s_rdata;
   input                           s_runf;
 
@@ -98,7 +103,13 @@ module util_rfifo (
   reg                             fifo_wr = 'd0;
   reg                             m_runf_m1 = 'd0;
   reg                             m_runf_m2 = 'd0;
+  reg   [M_DATA_WIDTH-1:0]        m_rdata = 'd0;
   reg                             m_runf = 'd0;
+  reg   [MS_CLOCK_RATIO-1:0]      m_en_m1;
+  reg                             m_en_m2;
+  reg                             s_en_s1;
+  reg                             s_en_sync;
+  reg                             s_en;
 
   // internal signals
 
@@ -112,10 +123,26 @@ module util_rfifo (
   // user to set a reasonable threshold on the full signal
 
   always @(posedge s_clk) begin
-    s_rd <= ~fifo_wfull;
-    fifo_wr <= ~fifo_wfull;
+    s_rd <= ~fifo_wfull & s_en_sync;
+    fifo_wr <= ~fifo_wfull & s_en_sync;
+    s_en <= s_en_sync;
   end
 
+  // enable sync
+  always @(posedge m_clk) begin
+    if (MS_CLOCK_RATIO > 1) begin
+        m_en_m1 <= {m_en_m1[MS_CLOCK_RATIO-2:0],m_en};
+    end else begin
+        m_en_m1 <= m_en;
+    end
+    m_en_m2 <= |m_en_m1;
+  end
+  
+  always @(posedge s_clk) begin
+    s_en_s1 <= m_en_m2;
+    s_en_sync <= s_en_s1;
+  end
+  
   genvar s;
   generate
   for (s = 0; s < S_DATA_WIDTH; s = s + 1) begin: g_wdata
@@ -137,7 +164,9 @@ module util_rfifo (
   genvar m;
   generate
   for (m = 0; m < M_DATA_WIDTH; m = m + 1) begin: g_rdata
-  assign m_rdata[m] = fifo_rdata[(M_DATA_WIDTH-1)-m];
+    always @(posedge m_clk) begin
+        m_rdata[m] <= fifo_rdata[(M_DATA_WIDTH-1)-m];
+    end
   end
   endgenerate
 
