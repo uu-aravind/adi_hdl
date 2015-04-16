@@ -1,32 +1,5 @@
 
 # constraints
-# hdmi
-
-set_property  -dict {PACKAGE_PIN  W18   IOSTANDARD LVCMOS33} [get_ports hdmi_out_clk]
-set_property  -dict {PACKAGE_PIN  W17   IOSTANDARD LVCMOS33} [get_ports hdmi_vsync]
-set_property  -dict {PACKAGE_PIN  V17   IOSTANDARD LVCMOS33} [get_ports hdmi_hsync]
-set_property  -dict {PACKAGE_PIN  U16   IOSTANDARD LVCMOS33} [get_ports hdmi_data_e]
-set_property  -dict {PACKAGE_PIN  Y13   IOSTANDARD LVCMOS33} [get_ports hdmi_data[0]]
-set_property  -dict {PACKAGE_PIN  AA13  IOSTANDARD LVCMOS33} [get_ports hdmi_data[1]]
-set_property  -dict {PACKAGE_PIN  AA14  IOSTANDARD LVCMOS33} [get_ports hdmi_data[2]]
-set_property  -dict {PACKAGE_PIN  Y14   IOSTANDARD LVCMOS33} [get_ports hdmi_data[3]]
-set_property  -dict {PACKAGE_PIN  AB15  IOSTANDARD LVCMOS33} [get_ports hdmi_data[4]]
-set_property  -dict {PACKAGE_PIN  AB16  IOSTANDARD LVCMOS33} [get_ports hdmi_data[5]]
-set_property  -dict {PACKAGE_PIN  AA16  IOSTANDARD LVCMOS33} [get_ports hdmi_data[6]]
-set_property  -dict {PACKAGE_PIN  AB17  IOSTANDARD LVCMOS33} [get_ports hdmi_data[7]]
-set_property  -dict {PACKAGE_PIN  AA17  IOSTANDARD LVCMOS33} [get_ports hdmi_data[8]]
-set_property  -dict {PACKAGE_PIN  Y15   IOSTANDARD LVCMOS33} [get_ports hdmi_data[9]]
-set_property  -dict {PACKAGE_PIN  W13   IOSTANDARD LVCMOS33} [get_ports hdmi_data[10]]
-set_property  -dict {PACKAGE_PIN  W15   IOSTANDARD LVCMOS33} [get_ports hdmi_data[11]]
-set_property  -dict {PACKAGE_PIN  V15   IOSTANDARD LVCMOS33} [get_ports hdmi_data[12]]
-set_property  -dict {PACKAGE_PIN  U17   IOSTANDARD LVCMOS33} [get_ports hdmi_data[13]]
-set_property  -dict {PACKAGE_PIN  V14   IOSTANDARD LVCMOS33} [get_ports hdmi_data[14]]
-set_property  -dict {PACKAGE_PIN  V13   IOSTANDARD LVCMOS33} [get_ports hdmi_data[15]]
-
-# spdif
-
-set_property  -dict {PACKAGE_PIN  U15   IOSTANDARD LVCMOS33} [get_ports spdif]
-
 # i2s
 
 set_property  -dict {PACKAGE_PIN  AB2   IOSTANDARD LVCMOS33} [get_ports i2s_mclk]
@@ -87,3 +60,18 @@ set_property  -dict {PACKAGE_PIN  J15   IOSTANDARD LVCMOS25} [get_ports gpio_bd[
 
 set_property  -dict {PACKAGE_PIN  G17   IOSTANDARD LVCMOS25} [get_ports gpio_bd[31]]      ; ## OTG-RESETN
 
+# clocks
+
+create_clock -name cpu_clk      -period 10.00 [get_pins i_system_wrapper/system_i/sys_ps7/FCLK_CLK0]
+create_clock -name m200_clk     -period  5.00 [get_pins i_system_wrapper/system_i/sys_ps7/FCLK_CLK1]
+create_clock -name i2s_clk    -period 50.00 [get_pins i_system_wrapper/system_i/sys_audio_clkgen/clk_out1]
+
+create_clock -name ps7_clk_0  -period 10.00 [get_pins i_system_wrapper/system_i/sys_ps7/inst/PS7_i/FCLKCLK[0]]
+create_clock -name ps7_clk_1  -period 5.00  [get_pins i_system_wrapper/system_i/sys_ps7/inst/PS7_i/FCLKCLK[1]]
+
+set_clock_groups -asynchronous -group {cpu_clk}
+set_clock_groups -asynchronous -group {m200_clk}
+
+set_clock_groups -asynchronous -group {i2s_clk}
+set_clock_groups -asynchronous -group {ps7_clk_0}
+set_clock_groups -asynchronous -group {ps7_clk_1}
