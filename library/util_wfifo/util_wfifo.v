@@ -100,6 +100,8 @@ module util_wfifo (
   reg                             m_wovf_m1 = 'd0;
   reg                             m_wovf_m2 = 'd0;
   reg                             m_wovf = 'd0;
+  reg                             fifo_wr = 'd0;
+  reg     [M_DATA_WIDTH-1:0]      fifo_wdata = 'd0;
   reg                             s_wr_int = 'd0;
 
   // internal signals
@@ -114,13 +116,14 @@ module util_wfifo (
 
   // write is pass through
 
-  assign fifo_wr = m_wr;
   assign m_wovf_s = s_wovf | fifo_wovf;
 
   genvar m;
   generate
   for (m = 0; m < M_DATA_WIDTH; m = m + 1) begin: g_wdata
-  assign fifo_wdata[m] = m_wdata[(M_DATA_WIDTH-1)-m];
+    always @(posedge m_clk) begin
+        fifo_wdata[m] <= m_wdata[(M_DATA_WIDTH-1)-m];
+    end
   end
   endgenerate
 
@@ -128,7 +131,9 @@ module util_wfifo (
     if (rstn == 1'b0) begin
       m_wovf_m1 <= 1'b0;
       m_wovf_m2 <= 1'b0;
+      fifo_wr <= 'd0;
     end else begin
+      fifo_wr <= m_wr;
       m_wovf_m1 <= m_wovf_s;
       m_wovf_m2 <= m_wovf_m1;
       m_wovf    <= m_wovf_m2;
