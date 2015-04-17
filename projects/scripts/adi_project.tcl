@@ -101,14 +101,8 @@ proc adi_project_create {project_name} {
     set_property board $project_board [current_project]
   }
 
-  set lib_dirs $ad_hdl_dir/library
-  if {$ad_hdl_dir ne $ad_phdl_dir} {
-    lappend lib_dirs $ad_phdl_dir/library
-  }
-
-  set_property ip_repo_paths $lib_dirs [current_fileset]
-  update_ip_catalog
-
+  adi_setup_libs
+  
   set_msg_config -id {BD 41-1348} -new_severity info
   set_msg_config -id {BD 41-1343} -new_severity info
   set_msg_config -id {BD 41-1306} -new_severity info
@@ -125,6 +119,36 @@ proc adi_project_create {project_name} {
   generate_target {synthesis implementation} [get_files  $project_system_dir/system.bd]
   make_wrapper -files [get_files $project_system_dir/system.bd] -top
   import_files -force -norecurse -fileset sources_1 $project_system_dir/hdl/system_wrapper.v
+}
+
+proc adi_setup_libs {} {
+  global ad_hdl_dir
+  global ad_phdl_dir 
+
+  set lib_dirs [get_property ip_repo_paths [current_fileset]]
+  
+  lappend lib_dirs $ad_hdl_dir/library
+  if {$ad_hdl_dir ne $ad_phdl_dir} {
+    lappend lib_dirs $ad_phdl_dir/library
+  }
+
+  
+  set_property ip_repo_paths $lib_dirs [current_fileset]
+  update_ip_catalog
+  adi_add_archive_ip $lib_dirs
+
+
+}
+
+proc adi_add_archive_ip {lib_dirs} {
+  global ad_hdl_dir
+  global ad_phdl_dir 
+  foreach libDir $lib_dirs {
+    set ipList [glob -nocomplain -directory $libDir *.zip]
+    foreach ipCore $ipList {
+      catch {update_ip_catalog -add_ip $ipCore -repo_path $libDir} 
+    }
+  }
 }
 
 proc adi_project_files {project_name project_files} {
@@ -199,8 +223,14 @@ proc adi_project_run {project_name} {
   export_hardware [get_files $project_system_dir/system.bd] [get_runs impl_1] -bitstream
 
   if [expr [get_property SLACK [get_timing_paths -delay_type min_max]] < 0] {
+    puts "-----------------------------------------------"
     puts "ERROR: Timing Constraints NOT met."
+    puts "-----------------------------------------------"    
     use_this_invalid_command_to_crash
+  } else {
+    puts "-----------------------------------------------"
+    puts "SUCCESS: Bitstream generation complete."
+    puts "-----------------------------------------------"    
   }
 }
 
