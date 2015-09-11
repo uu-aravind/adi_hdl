@@ -66,14 +66,6 @@ module system_top (
 
   gpio_bd,
 
-  hdmi_out_clk,
-  hdmi_vsync,
-  hdmi_hsync,
-  hdmi_data_e,
-  hdmi_data,
-
-  spdif,
-
   iic_scl,
   iic_sda,
 
@@ -160,14 +152,6 @@ module system_top (
   inout           FIXED_IO_ps_srstb;
 
   inout   [ 14:0] gpio_bd;
-
-  output          hdmi_out_clk;
-  output          hdmi_vsync;
-  output          hdmi_hsync;
-  output          hdmi_data_e;
-  output  [ 23:0] hdmi_data;
-
-  output          spdif;
 
   inout           iic_scl;
   inout           iic_sda;
@@ -331,11 +315,6 @@ module system_top (
     .GPIO_I (gpio_i),
     .GPIO_O (gpio_o),
     .GPIO_T (gpio_t),
-    .hdmi_data (hdmi_data),
-    .hdmi_data_e (hdmi_data_e),
-    .hdmi_hsync (hdmi_hsync),
-    .hdmi_out_clk (hdmi_out_clk),
-    .hdmi_vsync (hdmi_vsync),
     .iic_main_scl_io (iic_scl),
     .iic_main_sda_io (iic_sda),
     .ps_intr_0 (ps_intrs[0]),
@@ -362,7 +341,6 @@ module system_top (
     .rx_frame_in_0_p (rx_frame_in_0_p),
     .rx_frame_in_1_n (rx_frame_in_1_n),
     .rx_frame_in_1_p (rx_frame_in_1_p),
-    .spdif (spdif),
     .spi_csn_0_i (1'b1),
     .spi_csn_0_o (spi_ad9361_0),
     .spi_csn_1_o (spi_ad9361_1),
