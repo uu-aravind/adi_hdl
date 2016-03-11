@@ -33,5 +33,8 @@ reconfig_mif
 *.os
 *webtalk*
 library/archive/
+*.xml
+*.hw
+gui
 
 

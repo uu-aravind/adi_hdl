@@ -81,7 +81,7 @@ module daq3_spi (
       spi_count <= 6'd0;
       spi_rd_wr_n <= 1'd0;
     end else begin
-      spi_count <= spi_count + 1'b1;
+      spi_count <= (spi_count < 6'h3f) ? spi_count + 1'b1 : spi_count;
       if (spi_count == 6'd0) begin
         spi_rd_wr_n <= spi_mosi;
       end
@@ -100,11 +100,8 @@ module daq3_spi (
 
   // io butter
 
-  IOBUF i_iobuf_sdio (
-    .T (spi_enable_s),
-    .I (spi_mosi),
-    .O (spi_miso),
-    .IO (spi_sdio));
+  assign spi_miso = spi_sdio;
+  assign spi_sdio = (spi_enable_s == 1'b1) ? 1'bz : spi_mosi;
 
 endmodule
 

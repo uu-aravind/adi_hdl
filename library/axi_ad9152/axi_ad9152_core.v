@@ -80,8 +80,8 @@ module axi_ad9152_core (
 
   // parameters
 
-  parameter   PCORE_ID = 0;
-  parameter   DP_DISABLE = 0;
+  parameter   ID = 0;
+  parameter   DATAPATH_DISABLE = 0;
 
   // dac interface
 
@@ -163,7 +163,7 @@ module axi_ad9152_core (
 
   // dac channel
   
-  axi_ad9152_channel #(.CHID(0), .DP_DISABLE(DP_DISABLE)) i_channel_0 (
+  axi_ad9152_channel #(.CHANNEL_ID(0), .DATAPATH_DISABLE(DATAPATH_DISABLE)) i_channel_0 (
     .dac_clk (dac_clk),
     .dac_rst (dac_rst),
     .dac_enable (dac_enable_0),
@@ -184,7 +184,7 @@ module axi_ad9152_core (
 
   // dac channel
   
-  axi_ad9152_channel #(.CHID(1), .DP_DISABLE(DP_DISABLE)) i_channel_1 (
+  axi_ad9152_channel #(.CHANNEL_ID(1), .DATAPATH_DISABLE(DATAPATH_DISABLE)) i_channel_1 (
     .dac_clk (dac_clk),
     .dac_rst (dac_rst),
     .dac_enable (dac_enable_1),
@@ -205,7 +205,7 @@ module axi_ad9152_core (
 
   // dac common processor interface
 
-  up_dac_common #(.PCORE_ID(PCORE_ID)) i_up_dac_common (
+  up_dac_common #(.ID(ID)) i_up_dac_common (
     .mmcm_rst (),
     .dac_clk (dac_clk),
     .dac_rst (dac_rst),
@@ -219,7 +219,7 @@ module axi_ad9152_core (
     .dac_status (1'b1),
     .dac_status_ovf (dac_dovf),
     .dac_status_unf (dac_dunf),
-    .dac_clk_ratio (32'd40),
+    .dac_clk_ratio (32'd4),
     .up_drp_sel (),
     .up_drp_wr (),
     .up_drp_addr (),

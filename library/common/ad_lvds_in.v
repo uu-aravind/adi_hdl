@@ -64,7 +64,8 @@ module ad_lvds_in (
 
   // parameters
 
-  parameter   BUFTYPE = 0;
+  parameter   SINGLE_ENDED = 0;
+  parameter   DEVICE_TYPE = 0;
   parameter   IODELAY_CTRL = 0;
   parameter   IODELAY_GROUP = "dev_if_delay_group";
   localparam  SERIES7 = 0;
@@ -117,12 +118,20 @@ module ad_lvds_in (
 
   // receive data interface, ibuf -> idelay -> iddr
 
+  generate
+  if (SINGLE_ENDED == 1) begin
+  IBUF i_rx_data_ibuf (
+    .I (rx_data_in_p),
+    .O (rx_data_ibuf_s));
+  end else begin
   IBUFDS i_rx_data_ibuf (
     .I (rx_data_in_p),
     .IB (rx_data_in_n),
     .O (rx_data_ibuf_s));
+  end
+  endgenerate
 
-  if (BUFTYPE == VIRTEX6) begin
+  if (DEVICE_TYPE == VIRTEX6) begin
   (* IODELAY_GROUP = IODELAY_GROUP *)
   IODELAYE1 #(
     .CINVCTRL_SEL ("FALSE"),

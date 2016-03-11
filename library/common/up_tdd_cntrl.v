@@ -94,7 +94,7 @@ module up_tdd_cntrl (
   // parameters
 
   localparam  PCORE_VERSION = 32'h00010001;
-  parameter   PCORE_ID = 0;
+  parameter   ID = 0;
 
   input           clk;
   input           rst;
@@ -233,6 +233,9 @@ module up_tdd_cntrl (
       up_tdd_tx_dp_on_2 <= 24'h0;
     end else begin
       up_wack <= up_wreq_s;
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h02)) begin
+        up_scratch <= up_wdata;
+      end
       if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h10)) begin
         up_tdd_enable <= up_wdata[0];
         up_tdd_secondary <= up_wdata[1];
@@ -256,7 +259,7 @@ module up_tdd_cntrl (
       if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h20)) begin
         up_tdd_vco_rx_on_1 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h23)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h21)) begin
         up_tdd_vco_rx_off_1 <= up_wdata[23:0];
       end
       if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h22)) begin
@@ -283,34 +286,34 @@ module up_tdd_cntrl (
       if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h29)) begin
         up_tdd_tx_dp_off_1 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h20)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h30)) begin
         up_tdd_vco_rx_on_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h21)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h31)) begin
         up_tdd_vco_rx_off_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h22)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h32)) begin
         up_tdd_vco_tx_on_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h23)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h33)) begin
         up_tdd_vco_tx_off_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h32)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h34)) begin
         up_tdd_rx_on_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h33)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h35)) begin
         up_tdd_rx_off_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h34)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h36)) begin
         up_tdd_tx_on_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h35)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h37)) begin
         up_tdd_tx_off_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h36)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h38)) begin
         up_tdd_tx_dp_on_2 <= up_wdata[23:0];
       end
-      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h37)) begin
+      if ((up_wreq_s == 1'b1) && (up_waddr[7:0] == 8'h39)) begin
         up_tdd_tx_dp_off_2 <= up_wdata[23:0];
       end
     end
@@ -326,6 +329,9 @@ module up_tdd_cntrl (
       up_rack <= up_rreq_s;
       if (up_rreq_s == 1'b1) begin
         case (up_raddr[7:0])
+          8'h00: up_rdata <= PCORE_VERSION;
+          8'h01: up_rdata <= ID;
+          8'h02: up_rdata <= up_scratch;
           8'h10: up_rdata <= {28'h0, up_tdd_gated_tx_dmapath,
                                      up_tdd_gated_rx_dmapath,
                                      up_tdd_tx_only,
@@ -365,7 +371,7 @@ module up_tdd_cntrl (
 
   // rf tdd control signal CDC
 
-  up_xfer_cntrl #(.DATA_WIDTH(15)) i_tdd_control (
+  up_xfer_cntrl #(.DATA_WIDTH(15)) i_xfer_tdd_control (
     .up_rstn(up_rstn),
     .up_clk(up_clk),
     .up_data_cntrl({up_tdd_enable,
@@ -376,7 +382,7 @@ module up_tdd_cntrl (
                     up_tdd_gated_tx_dmapath,
                     up_tdd_burst_count,
                     up_tdd_terminal_type
-    }),
+                  }),
     .up_xfer_done(),
     .d_rst(rst),
     .d_clk(clk),
@@ -390,7 +396,7 @@ module up_tdd_cntrl (
                    tdd_terminal_type
     }));
 
-  up_xfer_cntrl #(.DATA_WIDTH(528)) i_tdd_counter_values (
+  up_xfer_cntrl #(.DATA_WIDTH(528)) i_xfer_tdd_counter_values (
     .up_rstn(up_rstn),
     .up_clk(up_clk),
     .up_data_cntrl({up_tdd_counter_init,
@@ -444,7 +450,7 @@ module up_tdd_cntrl (
     }));
 
 
-  up_xfer_status #(.DATA_WIDTH(8)) i_tdd_status (
+  up_xfer_status #(.DATA_WIDTH(8)) i_xfer_tdd_status (
     .up_rstn (up_rstn),
     .up_clk (up_clk),
     .up_data_status (up_tdd_status_s),
