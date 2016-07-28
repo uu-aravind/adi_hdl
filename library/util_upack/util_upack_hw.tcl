@@ -36,6 +36,10 @@ set_parameter_property NUM_OF_CHANNELS TYPE INTEGER
 set_parameter_property NUM_OF_CHANNELS UNITS None
 set_parameter_property NUM_OF_CHANNELS HDL_PARAMETER true
 
+add_parameter VALID_OUTPUT_MODE BOOLEAN false
+set_parameter_property VALID_OUTPUT_MODE DISPLAY_NAME "Use Valid Output"
+set_parameter_property VALID_OUTPUT_MODE HDL_PARAMETER false
+
 # defaults
 
 ad_alt_intf clock   dac_clk         input   1
@@ -53,62 +57,16 @@ add_interface_port fifo_ch_0  dac_valid_0   valid    Input  1
 add_interface_port fifo_ch_0  dac_data_0    data     Output  CHANNEL_DATA_WIDTH
 
 proc p_util_upack {} {
-
-  if {[get_parameter_value NUM_OF_CHANNELS] > 1} {
-    add_interface fifo_ch_1 conduit end
-    #set_interface_property fifo_ch_1  associatedClock if_dac_clk
-    add_interface_port fifo_ch_1  dac_enable_1  enable   Input  1
-    add_interface_port fifo_ch_1  dac_valid_1   valid    Input  1
-#    add_interface_port fifo_ch_1  upack_valid_1 valid_o  Output  1
-    add_interface_port fifo_ch_1  dac_data_1    data     Output  CHANNEL_DATA_WIDTH
-  }
-  if {[get_parameter_value NUM_OF_CHANNELS] > 2} {
-    add_interface fifo_ch_2 conduit end
-    #set_interface_property fifo_ch_2  associatedClock if_dac_clk
-    add_interface_port fifo_ch_2  dac_enable_2  enable   Input  1
-    add_interface_port fifo_ch_2  dac_valid_2   valid    Input  1
-#    add_interface_port fifo_ch_2  upack_valid_2 valid_o  Output  1
-    add_interface_port fifo_ch_2  dac_data_2    data     Output  CHANNEL_DATA_WIDTH
-  }
-  if {[get_parameter_value NUM_OF_CHANNELS] > 3} {
-    add_interface fifo_ch_3 conduit end
-    #set_interface_property fifo_ch_3  associatedClock if_dac_clk
-    add_interface_port fifo_ch_3  dac_enable_3  enable   Input  1
-    add_interface_port fifo_ch_3  dac_valid_3   valid    Input  1
-#    add_interface_port fifo_ch_3  upack_valid_3 valid_o  Output  1
-    add_interface_port fifo_ch_3  dac_data_3    data     Output  CHANNEL_DATA_WIDTH
-  }
-  if {[get_parameter_value NUM_OF_CHANNELS] > 4} {
-    add_interface fifo_ch_4 conduit end
-    #set_interface_property fifo_ch_4  associatedClock if_dac_clk
-    add_interface_port fifo_ch_4  dac_enable_4  enable   Input  1
-    add_interface_port fifo_ch_4  dac_valid_4   valid    Input  1
-#    add_interface_port fifo_ch_4  upack_valid_4 valid_o  Output  1
-    add_interface_port fifo_ch_4  dac_data_4    data     Output  CHANNEL_DATA_WIDTH
-  }
-  if {[get_parameter_value NUM_OF_CHANNELS] > 5} {
-    add_interface fifo_ch_5 conduit end
-    #set_interface_property fifo_ch_5  associatedClock if_dac_clk
-    add_interface_port fifo_ch_5  dac_enable_5  enable   Input  1
-    add_interface_port fifo_ch_5  dac_valid_5   valid    Input  1
-#    add_interface_port fifo_ch_5  upack_valid_5 valid_o  Output  1
-    add_interface_port fifo_ch_5  dac_data_5    data     Output  CHANNEL_DATA_WIDTH
-  }
-  if {[get_parameter_value NUM_OF_CHANNELS] > 6} {
-    add_interface fifo_ch_6 conduit end
-    #set_interface_property fifo_ch_6  associatedClock if_dac_clk
-    add_interface_port fifo_ch_6  dac_enable_6  enable   Input  1
-    add_interface_port fifo_ch_6  dac_valid_6   valid    Input  1
-#    add_interface_port fifo_ch_6  upack_valid_6 valid_o  Output  1
-    add_interface_port fifo_ch_6  dac_data_6    data     Output  CHANNEL_DATA_WIDTH
-  }
-  if {[get_parameter_value NUM_OF_CHANNELS] > 7} {
-    add_interface fifo_ch_7 conduit end
-    #set_interface_property fifo_ch_7  associatedClock if_dac_clk
-    add_interface_port fifo_ch_7  dac_enable_7  enable   Input  1
-    add_interface_port fifo_ch_7  dac_valid_7   valid    Input  1
-#    add_interface_port fifo_ch_7  upack_valid_7 valid_o  Output  1
-    add_interface_port fifo_ch_7  dac_data_7    data     Output  CHANNEL_DATA_WIDTH
-  }
+    for {set i 0} {$i < [get_parameter_value NUM_OF_CHANNELS]} {incr i} {
+        set if fifo_ch_${i}
+        add_interface ${if} conduit end
+        #set_interface_property fifo_ch_${i}  associatedClock if_dac_clk
+        add_interface_port ${if}  dac_enable_${i}  enable   Input  1
+        if {[get_parameter_value VALID_OUTPUT_MODE]} {
+            add_interface_port ${if}  upack_valid_${i} valid_o  Output  1
+        }
+        add_interface_port ${if}  dac_valid_${i}   valid    Input  1    
+        add_interface_port ${if}  dac_data_${i}    data     Output  CHANNEL_DATA_WIDTH   
+    }
 }
 
